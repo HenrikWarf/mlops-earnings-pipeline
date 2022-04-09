@@ -1,0 +1,9 @@
+gunicorn
+flask
+pyarrow
+pandas
+numpy
+sklearn
+google-cloud-aiplatform
+google-cloud-bigquery
+google-cloud-storage
