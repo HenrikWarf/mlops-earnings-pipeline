@@ -25,7 +25,7 @@ from google.cloud import storage
 import pyarrow
 
 # Set some initial project and ML variables
-MODEL_VERSION = "v8"
+MODEL_VERSION = "v9"
 PROJECT_ID = "crazy-hippo-01"
 BUCKET = "custom-earnings-model"
 
