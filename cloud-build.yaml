@@ -1,7 +1,7 @@
 
 steps: 
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'us-west1-docker.pkg.dev/${PROJECT_ID}/custom-earnings-pipeline/vertex-custom-training:${COMMIT_SHA}', '.']
+  args: ['build', '-t', 'us-west1-docker.pkg.dev/${PROJECT_ID}/custom-earnings-pipeline/vertex-custom-training:$COMMIT_SHA', '.']
   id: 'Building Cloud Run Container - Pipeline Execution Step'
 
 - name: 'gcr.io/cloud-builders/docker'
