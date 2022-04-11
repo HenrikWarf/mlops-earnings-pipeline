@@ -11,48 +11,32 @@ app = Flask(__name__)
 @app.route("/", methods=["POST"])
 def pipeline_run(): 
 
-    TIMESTAMP = datetime.now().strftime("%Y%m%d%H%M%S")
-    MODEL_VERSION = "v12"
-    LOCATION = "us-west1"
-    MODEL_FILENAME = 'earnings_model_{}.pkl'.format(MODEL_VERSION)
-    JOB_NAME = MODEL_FILENAME + TIMESTAMP
-    MACHINE_TYPE = "n1-standard-4"
-    REPLICA_COUNT = 1
-    ACCELERATOR_COUNT = 0
+    REGION = "us-west1"
     PROJECT_ID = "crazy-hippo-01"
-    BUCKET_NAME = "gs://custom-earnings-model/" 
+    DISPLAY_NAME = "earnings-classifier-pipeline"
+    COMPILED_PIPELINE_PATH = "earnings_pipeline.json"
+    JOB_ID = ""
+    PIPELINE_PARAMETERS = {}
+    ENABLE_CACHING = False
     SERVICE_ACCOUNT = 'pipelines-vertex-ai@crazy-hippo-01.iam.gserviceaccount.com'
-    BASE_IMAGE_URI = "europe-docker.pkg.dev/vertex-ai/training/scikit-learn-cpu.0-23:latest"
-    MODEL_DISPLAY_NAME = MODEL_FILENAME + TIMESTAMP
-    SCRIPT_PATH = "task.py"
+    PIPELINE_ROOT_PATH = 'gs://crazy-vertex-ai-pipelines/earnings_classifier/crazy-hippo'
+    
 
 
-    aiplatform.init(project=PROJECT_ID, location=LOCATION, staging_bucket=BUCKET_NAME)
+    from google.cloud import aiplatform
 
-    job = aiplatform.CustomTrainingJob(
-        display_name=JOB_NAME,
-        script_path=SCRIPT_PATH,
-        container_uri=BASE_IMAGE_URI,
-        requirements=["pyarrow", 
-                      "pandas", 
-                      "numpy", 
-                      "sklearn", 
-                      "google.cloud", 
-                      "google-cloud-bigquery", 
-                      "google-cloud-storage"],
-        model_serving_container_image_uri=BASE_IMAGE_URI,
+    job = aiplatform.PipelineJob(display_name = DISPLAY_NAME,
+                                 template_path = COMPILED_PIPELINE_PATH,
+                                 job_id = JOB_ID,
+                                 pipeline_root = PIPELINE_ROOT_PATH,
+                                 parameter_values = PIPELINE_PARAMETERS,
+                                 enable_caching = ENABLE_CACHING,
+                                 project = PROJECT_ID,
+                                 location = REGION)
+
+    job.submit(
+        service_account=SERVICE_ACCOUNT
     )
-
-    # Start the training
-
-    model = job.run(
-        model_display_name=MODEL_DISPLAY_NAME,
-    #    args=CMDARGS,
-        replica_count=REPLICA_COUNT,
-        machine_type=MACHINE_TYPE,
-        service_account=SERVICE_ACCOUNT,
-        accelerator_count=ACCELERATOR_COUNT,
-        )
 
 
     Print("EarningsPred. Pipeline Job Done!")

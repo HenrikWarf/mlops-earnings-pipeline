@@ -1,0 +1,67 @@
+name: Data ingestion
+inputs:
+- {name: INPUT_DATA, type: String}
+- {name: DATASET_VERSION, type: Integer}
+outputs:
+- {name: DATASET, type: Dataset}
+- {name: pipeline_metrics, type: Metrics}
+- {name: dataset_name, type: String}
+- {name: dataset_version, type: Integer}
+- {name: num_of_examples, type: Integer}
+- {name: categorical_col, type: Integer}
+- {name: numeric_col, type: Integer}
+implementation:
+  container:
+    image: python:3.9
+    command:
+    - sh
+    - -c
+    - |2
+
+      if ! [ -x "$(command -v pip)" ]; then
+          python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip
+      fi
+
+      PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'pandas' 'google-cloud-bigquery' 'pyarrow' 'gcsfs' 'numpy' 'kfp' 'db_dtypes' 'kfp==1.8.12' && "$0" "$@"
+    - sh
+    - -ec
+    - |
+      program_path=$(mktemp -d)
+      printf "%s" "$0" > "$program_path/ephemeral_component.py"
+      python3 -m kfp.v2.components.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+    - "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing\
+      \ import *\n\ndef data_ingestion(\n        INPUT_DATA : str,\n        DATASET_VERSION\
+      \ : int,\n        DATASET : Output[Dataset],\n        pipeline_metrics: Output[Metrics])\
+      \ -> NamedTuple(\n          'ComponentOutputs',\n          [\n             \
+      \ ('dataset_name', str),\n              ('dataset_version', int),\n        \
+      \      ('num_of_examples', int),\n              ('categorical_col', int),\n\
+      \              ('numeric_col', int)\n          ]\n    ):\n\n    #Import libraries\n\
+      \n    import pandas as pd\n    import time\n    import numpy\n    from google.cloud.bigquery\
+      \ import Client, QueryJobConfig\n\n\n    #Initiate BigQuery Client\n\n    client\
+      \ = Client(project='crazy-hippo-01')\n    query = \"\"\"SELECT age, workclass,\
+      \ occupation, education_num, marital_status, capital_gain, income_bracket\n\
+      \    FROM `crazy-hippo-01.census_data_us.census_raw` \n    LIMIT 20000\n   \
+      \ \"\"\"\n\n    #Run Query\n\n    job = client.query(query)\n    df = job.to_dataframe()\n\
+      \n    #Set and calculate Dataset Metadata\n\n    dataset_name = INPUT_DATA\n\
+      \    dataset_version = DATASET_VERSION\n    num_of_examples = len(df)\n\n  \
+      \  #Counting Data Types\n\n    categorical_col = 0\n    numeric_col = 0\n  \
+      \  for col in df.columns : \n        print(type(df[col][0]))\n        if type(df[col][0])\
+      \ == str :  \n            categorical_col += 1\n        elif type(df[col][0])\
+      \ == numpy.int64 :\n            numeric_col += 1\n\n    #Write data to GCS \n\
+      \n    df.to_csv(DATASET.path, index=False, header=True)\n\n    # Log Metrics\n\
+      \n    pipeline_metrics.log_metric('dataset_name', dataset_name)\n    pipeline_metrics.log_metric('dataset_version',\
+      \ dataset_version)\n    pipeline_metrics.log_metric('num_of_examples', num_of_examples)\n\
+      \    pipeline_metrics.log_metric('categorical_col', categorical_col)\n    pipeline_metrics.log_metric('numeric_col',\
+      \ numeric_col)\n\n\n    #Outputs of Component defined by named tuple\n\n   \
+      \ from collections import namedtuple\n    component_outputs = namedtuple('ComponentOutputs',\n\
+      \        ['dataset_name', \n         'dataset_version', \n         'num_of_examples',\
+      \ \n         'categorical_col', \n         'numeric_col'])\n\n    #Returning\
+      \ outputs\n\n    return component_outputs(dataset_name, \n                 \
+      \            dataset_version, \n                             num_of_examples,\
+      \ \n                             categorical_col, \n                       \
+      \      numeric_col)\n\n"
+    args:
+    - --executor_input
+    - {executorInput: null}
+    - --function_to_execute
+    - data_ingestion

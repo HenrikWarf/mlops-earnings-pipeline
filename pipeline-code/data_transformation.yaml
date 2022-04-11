@@ -1,0 +1,80 @@
+name: Data transformation
+inputs:
+- {name: DATASET, type: Dataset}
+outputs:
+- {name: TRAINING_DATA, type: Dataset}
+- {name: TEST_DATA, type: Dataset}
+- {name: VALIDATION_DATA, type: Dataset}
+implementation:
+  container:
+    image: python:3.9
+    command:
+    - sh
+    - -c
+    - |2
+
+      if ! [ -x "$(command -v pip)" ]; then
+          python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip
+      fi
+
+      PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'pandas' 'google-cloud-bigquery' 'pyarrow' 'gcsfs' 'sklearn' 'db_dtypes' 'kfp==1.8.12' && "$0" "$@"
+    - sh
+    - -ec
+    - |
+      program_path=$(mktemp -d)
+      printf "%s" "$0" > "$program_path/ephemeral_component.py"
+      python3 -m kfp.v2.components.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+    - |2+
+
+      import kfp
+      from kfp.v2 import dsl
+      from kfp.v2.dsl import *
+      from typing import *
+
+      def data_transformation(
+              DATASET : Input[Dataset],
+              TRAINING_DATA : Output[Dataset],
+              TEST_DATA : Output[Dataset],
+              VALIDATION_DATA : Output[Dataset]
+          ):
+
+          #Import libraries
+          import pandas as pd
+          import time
+          from sklearn.model_selection import train_test_split
+          from google.cloud.bigquery import Client, QueryJobConfig
+
+          df = pd.read_csv(DATASET.path)
+
+          #Drop null values in dataset
+          df = df.dropna()
+
+          #Create training, test and validation datasets
+          train, test = train_test_split(df, test_size=0.20, random_state=42)
+          train, val = train_test_split(train, test_size=0.20, random_state=42)
+
+          #Define Staging Bucket in GCS
+          #BUCKET = 'gcs://crazy-hippo-01/kubeflow_staging/earnings_model/'
+          #TRAINING_PATH = BUCKET + 'datasets/training/training{}'.format(str(int(time.time())))  + '.csv'
+          #TEST_PATH = BUCKET + 'datasets/testing/test{}'.format(str(int(time.time())))  + '.csv'
+          #VALIDATION_PATH = BUCKET + 'datasets/validation/validation{}'.format(str(int(time.time())))  + '.csv'
+
+          #Define Datasets Names
+          #TRAINING_DATA.uri = TRAINING_PATH
+          #TEST_DATA.uri = TEST_PATH
+          #VALIDATION_DATA.uri = VALIDATION_PATH
+
+          print(TRAINING_DATA.path)
+          print(TEST_DATA.path)
+          print(VALIDATION_DATA.path)
+
+          #Write data to GCS Storage
+          train.to_csv(TRAINING_DATA.path, index=False, header=True)
+          test.to_csv(TEST_DATA.path, index=False, header=True)
+          val.to_csv(VALIDATION_DATA.path, index=False, header=True)
+
+    args:
+    - --executor_input
+    - {executorInput: null}
+    - --function_to_execute
+    - data_transformation
