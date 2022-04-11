@@ -6,6 +6,7 @@ WORKDIR /root
 # Copies the trainer code to the docker image.
 COPY cloud-run-execution/main.py /root/main.py
 COPY pipeline-code/earnings_pipeline.json /root/earnings_pipeline.json
+COPY cloud-run-execution/requirements.txt /root/requirements.txt
 
 # Installs additional packages
 RUN pip3 install -r requirements.txt 
