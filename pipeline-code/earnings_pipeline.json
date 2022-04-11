@@ -263,7 +263,7 @@
       }
     },
     "pipelineInfo": {
-      "name": "binaryclassmodel8"
+      "name": "earnings-classifier"
     },
     "root": {
       "dag": {
