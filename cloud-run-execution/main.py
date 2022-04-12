@@ -39,7 +39,9 @@ def pipeline_run():
     )
 
 
-    print("EarningsPred. Pipeline is Executing!")
+    print("Pipeline is Executing!")
+    
+    return("Done!")
 
 if __name__ == "__main__":
     PORT = int(os.getenv("PORT")) if os.getenv("PORT") else 8080
