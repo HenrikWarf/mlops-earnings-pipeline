@@ -17,4 +17,4 @@ steps:
     - 'us-west1'
     - '--image'
     - 'us-west1-docker.pkg.dev/${PROJECT_ID}/custom-earnings-pipeline/vertex-custom-training:${BUILD_ID}'
-  id: 'Deploy Pipeline execution container in Cloud Run'
+  id: 'Deploy Pipeline Execution container in Cloud Run'
