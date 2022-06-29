@@ -49,20 +49,12 @@ implementation:
           #Drop null values in dataset
           df = df.dropna()
 
+          #Transform label to integer data type and format 1 or 0
+          df['label'] = [int(1) if x == '>50K' else int(0) for x in df['label']]
+
           #Create training, test and validation datasets
           train, test = train_test_split(df, test_size=0.20, random_state=42)
           train, val = train_test_split(train, test_size=0.20, random_state=42)
-
-          #Define Staging Bucket in GCS
-          #BUCKET = 'gcs://crazy-hippo-01/kubeflow_staging/earnings_model/'
-          #TRAINING_PATH = BUCKET + 'datasets/training/training{}'.format(str(int(time.time())))  + '.csv'
-          #TEST_PATH = BUCKET + 'datasets/testing/test{}'.format(str(int(time.time())))  + '.csv'
-          #VALIDATION_PATH = BUCKET + 'datasets/validation/validation{}'.format(str(int(time.time())))  + '.csv'
-
-          #Define Datasets Names
-          #TRAINING_DATA.uri = TRAINING_PATH
-          #TEST_DATA.uri = TEST_PATH
-          #VALIDATION_DATA.uri = VALIDATION_PATH
 
           print(TRAINING_DATA.path)
           print(TEST_DATA.path)

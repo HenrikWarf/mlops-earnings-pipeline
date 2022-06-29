@@ -35,7 +35,7 @@ implementation:
       \    VAL_DATA = pd.read_csv(VALIDATION_DATA.path)\n\n    BATCH_SIZE = 32\n\n\
       \    print(tf.__version__)\n\n    print(MODEL.path)\n\n    #TENSORFLOW DATASET\
       \ FUNCTION\n    def helperfunc_create_dataset(dataframe, shuffle=True, batch_size=5):\n\
-      \        dataframe = dataframe.copy()\n        labels = dataframe.pop('income_bracket')\n\
+      \        dataframe = dataframe.copy()\n        labels = dataframe.pop('label')\n\
       \        ds = tf.data.Dataset.from_tensor_slices((dict(dataframe), labels))\n\
       \        if shuffle:\n            ds = ds.shuffle(buffer_size=len(dataframe))\n\
       \        ds = ds.batch(batch_size)\n        ds = ds.prefetch(batch_size)\n \
@@ -66,9 +66,9 @@ implementation:
       \    ALL_INPUTS = []\n    ENCODED_FEATURES = []\n\n    NUMERICAL = ['age' ,\
       \ 'capital_gain']\n    CATEGORICAL_INT_COLS = ['education_num']\n    CATEGORICAL_STRING_COLS\
       \ = ['occupation', \n                               'workclass', \n        \
-      \                       'marital_status']\n    TARGET = ['income_bracket']\n\
-      \n    # Numeric features.\n    for header in NUMERICAL:\n        numeric_col\
-      \ = tf.keras.Input(shape=(1,), name=header)\n        normalization_layer = helperfunc_get_normalization_layer(header,\
+      \                       'marital_status']\n    TARGET = ['label']\n\n    # Numeric\
+      \ features.\n    for header in NUMERICAL:\n        numeric_col = tf.keras.Input(shape=(1,),\
+      \ name=header)\n        normalization_layer = helperfunc_get_normalization_layer(header,\
       \ TRAIN_DS)\n        encoded_numeric_col = normalization_layer(numeric_col)\n\
       \        ALL_INPUTS.append(numeric_col)\n        ENCODED_FEATURES.append(encoded_numeric_col)\n\
       \n    # Categorical features encoded as integers.\n    for header in CATEGORICAL_INT_COLS:\n\
@@ -88,7 +88,7 @@ implementation:
       \                  loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),\n\
       \                  metrics=[\"accuracy\"])\n\n    #TRAIN MODEL\n    history\
       \ = model.fit(TRAIN_DS, epochs=10, validation_data=VALIDATION_DS)\n\n\n    #Define\
-      \ Bucket in GCS for Model Storage\n    BUCKET = 'gs://crazy-hippo-01/kubeflow_staging/earnings_model/models/'\n\
+      \ Bucket in GCS for Model Storage\n    BUCKET = 'gs://crazy-pipelines/models/'\n\
       \n    #Define MODEL PATH \n    MODEL_PATH = BUCKET + 'earnings_model{}'.format(str(int(time.time())))\n\
       \n    MODEL.uri = MODEL_PATH \n\n\n    #Save model to Artifact Store for Project\n\
       \    model.save(MODEL.path)\n\n    print('Model saved to: ' + MODEL.path)\n\n"
