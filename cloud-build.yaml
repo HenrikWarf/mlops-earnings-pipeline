@@ -1,11 +1,11 @@
 
 steps: 
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/custom-earnings-pipeline/vertex-custom-training:${BUILD_ID}', '.']
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/${ART_REPO_NAME}/${IMAGE_NAME}:${BUILD_ID}', '.']
   id: 'Building Cloud Run Container - Pipeline Execution Step'
 
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/custom-earnings-pipeline/vertex-custom-training:${BUILD_ID}']
+  args: [ 'push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/${ART_REPO_NAME}/${IMAGE_NAME}:${BUILD_ID}']
   id: 'Pushing Cloud Run Container to Artifact Registrty'
 
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -16,5 +16,5 @@ steps:
     - '--region'
     - 'us-central1'
     - '--image'
-    - 'us-central-docker.pkg.dev/${PROJECT_ID}/custom-earnings-pipeline/vertex-custom-training:${BUILD_ID}'
+    - 'us-central-docker.pkg.dev/${PROJECT_ID}/${ART_REPO_NAME}/${IMAGE_NAME}:${BUILD_ID}'
   id: 'Deploy Pipeline Execution container in Cloud Run'
