@@ -11,15 +11,15 @@ app = Flask(__name__)
 @app.route("/", methods=["POST"])
 def pipeline_run(): 
 
-    REGION = "us-west1"
-    PROJECT_ID = "crazy-hippo-01"
+    REGION = "us-central1"
+    PROJECT_ID = "mlops-dev-999-c6b8"
     DISPLAY_NAME = "earnings-classifier-pipeline"
     COMPILED_PIPELINE_PATH = "earnings_pipeline.json"
     JOB_ID = ""
     PIPELINE_PARAMETERS = {}
     ENABLE_CACHING = False
-    SERVICE_ACCOUNT = 'pipelines-vertex-ai@crazy-hippo-01.iam.gserviceaccount.com'
-    PIPELINE_ROOT_PATH = 'gs://crazy-vertex-ai-pipelines/earnings_classifier/crazy-hippo'
+    SERVICE_ACCOUNT = 'ml1-dev-sa@mlops-dev-999-c6b8.iam.gserviceaccount.com'
+    PIPELINE_ROOT_PATH = 'gs://crazy-pipelines/earnings_classifier/crazy-hippo'
     
 
 
