@@ -17,4 +17,6 @@ steps:
     - 'us-central1'
     - '--image'
     - 'us-central1-docker.pkg.dev/${PROJECT_ID}/ml-dev-99/earnings-pipline-kf:${BUILD_ID}'
+    - '--service-account'
+    - 'ml1-dev-sa@mlops-dev-999-c6b8.iam.gserviceaccount.com'
   id: 'Deploy Pipeline Execution container in Cloud Run'
