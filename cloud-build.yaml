@@ -16,5 +16,5 @@ steps:
     - '--region'
     - 'us-central1'
     - '--image'
-    - 'us-central-docker.pkg.dev/${PROJECT_ID}/ml-dev-99/earnings-pipline-kf:${BUILD_ID}'
+    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/ml-dev-99/earnings-pipline-kf:${BUILD_ID}'
   id: 'Deploy Pipeline Execution container in Cloud Run'
