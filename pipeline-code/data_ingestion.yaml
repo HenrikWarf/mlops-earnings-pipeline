@@ -22,7 +22,7 @@ implementation:
           python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip
       fi
 
-      PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'pandas' 'google-cloud-bigquery' 'pyarrow' 'gcsfs' 'numpy' 'kfp' 'db_dtypes' 'kfp==1.8.12' && "$0" "$@"
+      PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'pandas' 'google-cloud-bigquery' 'pyarrow' 'gcsfs' 'numpy' 'kfp' 'db_dtypes' 'kfp==1.8.13' && "$0" "$@"
     - sh
     - -ec
     - |
@@ -39,9 +39,9 @@ implementation:
       \n    import pandas as pd\n    import time\n    import numpy\n    from google.cloud.bigquery\
       \ import Client, QueryJobConfig\n    from google.cloud import bigquery\n   \
       \ import random\n\n\n\n    #Initiate BigQuery Client\n\n    examples = random.randint(10000,\
-      \ 32561)\n\n    client = Client(project='mlops-dev-999-c6b8', location=\"us\"\
+      \ 32561)\n\n    client = Client(project='crazy-project-01', location=\"us\"\
       )\n    query = \"\"\"SELECT age, workclass, occupation, education_num, marital_status,\
-      \ capital_gain, label\n    FROM `mlops-dev-999-c6b8.earnings_prediction.earnings_raw_data`\
+      \ capital_gain, label\n    FROM `crazy-project-01.income_prediction.raw_table`\
       \ \n    LIMIT @examples\n    \"\"\"\n\n    #Run Query\n    job_config = bigquery.QueryJobConfig(\n\
       \        query_parameters=[\n            bigquery.ScalarQueryParameter(\"examples\"\
       , \"INT64\", examples),\n        ]\n)\n    job = client.query(query, job_config=job_config)\n\

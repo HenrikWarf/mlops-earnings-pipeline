@@ -17,7 +17,7 @@ implementation:
           python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip
       fi
 
-      PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'pandas' 'pyarrow' 'gcsfs' 'google-cloud-bigquery-storage' 'tensorflow==2.5' 'db_dtypes' 'kfp==1.8.12' && "$0" "$@"
+      PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'pandas' 'pyarrow' 'gcsfs' 'google-cloud-bigquery-storage' 'tensorflow==2.5' 'db_dtypes' 'kfp==1.8.13' && "$0" "$@"
     - sh
     - -ec
     - |
@@ -88,7 +88,7 @@ implementation:
       \                  loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),\n\
       \                  metrics=[\"accuracy\"])\n\n    #TRAIN MODEL\n    history\
       \ = model.fit(TRAIN_DS, epochs=10, validation_data=VALIDATION_DS)\n\n\n    #Define\
-      \ Bucket in GCS for Model Storage\n    BUCKET = 'gs://crazy-pipelines/models/'\n\
+      \ Bucket in GCS for Model Storage\n    BUCKET = 'gs://crazy-pipe-01/models/'\n\
       \n    #Define MODEL PATH \n    MODEL_PATH = BUCKET + 'earnings_model{}'.format(str(int(time.time())))\n\
       \n    MODEL.uri = MODEL_PATH \n\n\n    #Save model to Artifact Store for Project\n\
       \    model.save(MODEL.path)\n\n    print('Model saved to: ' + MODEL.path)\n\n"

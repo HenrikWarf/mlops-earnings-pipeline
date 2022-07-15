@@ -26,7 +26,7 @@ implementation:
           python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip
       fi
 
-      PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'pandas' 'google-cloud-bigquery' 'pyarrow' 'gcsfs' 'tensorflow==2.5' 'google-cloud-aiplatform' 'db_dtypes' 'kfp==1.8.12' && "$0" "$@"
+      PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'pandas' 'google-cloud-bigquery' 'pyarrow' 'gcsfs' 'tensorflow==2.5' 'google-cloud-aiplatform' 'db_dtypes' 'kfp==1.8.13' && "$0" "$@"
     - sh
     - -ec
     - |
@@ -66,9 +66,9 @@ implementation:
       \    print(\"Loss\", loss)\n\n\n    from tensorflow.python.lib.io import file_io\
       \    \n\n    #Write Metrics to BigQuery Table for Validation and possible promotion\
       \ to Deployment\n    from google.cloud.bigquery import Client, QueryJobConfig\n\
-      \n    #Initiate BigQuery Client\n    client = Client(project='mlops-dev-999-c6b8',\
+      \n    #Initiate BigQuery Client\n    client = Client(project='crazy-project-01',\
       \ location=\"us\")\n\n    print('Sending Metrics into BigQuery')\n\n    #Define\
-      \ DML Query to Insert Metrics into BugQuery\n    query = \"\"\"INSERT `mlops-dev-999-c6b8.earnings_prediction.model_metrics_history`\
+      \ DML Query to Insert Metrics into BugQuery\n    query = \"\"\"INSERT `crazy-project-01.income_prediction.model_metrics_history`\
       \ (model_name, pipeline, framework, accuracy, loss)\n    VALUES (\"{}\", \"\
       {}\", \"{}\", {}, {})  \n    \"\"\".format(MODEL.path, pipeline, framework,\
       \ accuracy, loss)\n\n    #Run Query\n    job = client.query(query)\n\n    print('Metrics\
@@ -76,7 +76,7 @@ implementation:
       \ accuracy)\n    pipeline_metrics.log_metric('loss', loss)\n\n    from collections\
       \ import namedtuple\n\n    component_outputs = namedtuple('ComponentOutputs',\n\
       \        ['accuracy', 'loss'])\n\n\n    from datetime import datetime\n\n  \
-      \  TIMESTAMP = datetime.now().strftime(\"%Y%m%d%H%M%S\")\n    MY_PROJECT = 'mlops-dev-999-c6b8'\n\
+      \  TIMESTAMP = datetime.now().strftime(\"%Y%m%d%H%M%S\")\n    MY_PROJECT = 'crazy-project-01'\n\
       \    REGION = 'us-central1'\n    EXPERIMENT_NAME = 'earnings-classifier-ver1'\n\
       \    RUN_NAME = \"tensorflow-dl-model-\" + TIMESTAMP\n\n\n    #Store Experiment\
       \ Metrics in Vertex AI\n    from google.cloud import aiplatform\n\n    aiplatform.init(project=MY_PROJECT,\
@@ -86,8 +86,8 @@ implementation:
       \    }\n\n    aiplatform.log_params(PARAMETERS)\n\n    METRICS = {\n       \
       \ 'Num_of_examples': num_of_examples,\n        'Categorical_col': categorical_col,\n\
       \        'Numeric_col': numeric_col,\n        \"Accuracy\": accuracy, \n   \
-      \     \"Loss\": loss\n    }\n\n    aiplatform.log_metrics(METRICS)\n\n    from\
-      \ collections import namedtuple\n\n    component_outputs = namedtuple('ComponentOutputs',\
+      \     \"Loss\": loss\n    }\n\n    aiplatform.log_metrics(METRICS)\n\n    aiplatform.end_run()\n\
+      \n    from collections import namedtuple\n\n    component_outputs = namedtuple('ComponentOutputs',\
       \ \n                                   ['accuracy', 'loss', 'dep_decision'])\n\
       \n\n    return component_outputs(accuracy, loss, dep_decision)\n\n"
     args:
